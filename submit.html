@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Submission — eBook Writers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060e;
+    --surface: #0f0f1a;
+    --surface2: #171724;
+    --surface3: #1e1e2e;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --yellow: #f5c842;
+    --yellow-dim: rgba(245,200,66,0.1);
+    --yellow-glow: rgba(245,200,66,0.2);
+    --mint: #2dffa0;
+    --mint-dim: rgba(45,255,160,0.08);
+    --pink: #ff4d8d;
+    --purple: #8b5cf6;
+    --cream: #faf5e4;
+    --text: #e2e2f0;
+    --muted: rgba(226,226,240,0.4);
+    --ink: #06060e;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Animated Background ── */
+  .bg-canvas {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  }
+  .bg-canvas::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 55% 45% at 90% 5%, rgba(139,92,246,.2) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 5% 90%, rgba(245,200,66,.08) 0%, transparent 55%),
+      radial-gradient(ellipse 35% 35% at 50% 50%, rgba(45,255,160,.04) 0%, transparent 60%);
+  }
+  .bg-canvas::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(245,200,66,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,200,66,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* ── Page ── */
+  .page {
+    position: relative; z-index: 1;
+    max-width: 680px; margin: 0 auto;
+    padding: clamp(28px,6vw,72px) clamp(16px,5vw,40px);
+  }
+
+  /* ── Header ── */
+  .header { margin-bottom: 44px; }
+  .header-pill {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--yellow-dim); border: 1px solid rgba(245,200,66,.22);
+    color: var(--yellow); font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    padding: 7px 16px; border-radius: 100px; margin-bottom: 22px;
+    animation: fadeUp .5s ease both;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--mint); box-shadow: 0 0 8px var(--mint);
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.65)} }
+
+  .header h1 {
+    font-family: 'Syne', sans-serif; font-weight: 900;
+    font-size: clamp(34px,7vw,60px); line-height: 1.02;
+    letter-spacing: -.025em; color: var(--cream);
+    animation: fadeUp .5s .08s ease both;
+  }
+  .header h1 em {
+    font-style: normal;
+    background: linear-gradient(120deg, var(--yellow) 20%, var(--mint) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p {
+    margin-top: 16px; font-size: 15px; line-height: 1.65;
+    color: var(--muted); max-width: 440px;
+    animation: fadeUp .5s .16s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── Card ── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: clamp(24px,5vw,44px);
+    animation: fadeUp .5s .22s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(245,200,66,.25) 40%, rgba(45,255,160,.2) 70%, transparent 100%);
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 10px;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--yellow);
+    margin-bottom: 18px; display: flex; align-items: center; gap: 12px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+  /* ── Identity ── */
+  .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+  @media (max-width: 480px) { .identity-grid { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .field input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+  }
+  .field input::placeholder { color: var(--muted); }
+  .field input:focus {
+    border-color: rgba(245,200,66,.5); background: var(--surface3);
+    box-shadow: 0 0 0 4px var(--yellow-dim);
+  }
+  .field input.error { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(255,77,141,.1); }
+  .field .hint { font-size: 11px; color: var(--muted); }
+
+  /* ── Date badge ── */
+  .date-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--mint-dim); border: 1px solid rgba(45,255,160,.18);
+    color: var(--mint); font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 13px; padding: 11px 18px; border-radius: 12px; margin-bottom: 28px;
+  }
+
+  /* ── Progress ── */
+  .progress-wrap { margin-bottom: 24px; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .progress-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+  .progress-count { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; color: var(--yellow); }
+  .progress-bar { height: 7px; background: var(--surface2); border-radius: 100px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--yellow), var(--mint)); border-radius: 100px; transition: width .4s cubic-bezier(.4,0,.2,1); width: 0%; }
+
+  /* ── Book rows ── */
+  .books-section { margin-bottom: 24px; }
+  .book-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px; animation: slideIn .3s ease both;
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+  .book-num {
+    min-width: 34px; height: 34px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 12px;
+    color: var(--yellow); flex-shrink: 0;
+  }
+  .book-input-wrap { flex: 1; position: relative; }
+  .book-input-wrap input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 11px; padding: 12px 44px 12px 14px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+  }
+  .book-input-wrap input::placeholder { color: var(--muted); font-size: 13px; }
+  .book-input-wrap input:focus { border-color: rgba(245,200,66,.4); background: var(--surface3); box-shadow: 0 0 0 3px var(--yellow-dim); }
+  .book-input-wrap input.filled { border-color: rgba(45,255,160,.3); background: rgba(45,255,160,.04); }
+  .book-check { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: var(--mint); opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .book-input-wrap input.filled + .book-check { opacity: 1; }
+  .remove-btn {
+    width: 34px; height: 34px; border-radius: 10px; background: transparent;
+    border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; flex-shrink: 0; font-size: 17px;
+  }
+  .remove-btn:hover { background: rgba(255,77,141,.1); border-color: var(--pink); color: var(--pink); }
+  .add-book-btn {
+    width: 100%; padding: 13px; background: transparent;
+    border: 1.5px dashed rgba(245,200,66,.25); border-radius: 11px;
+    color: var(--yellow); font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all .2s; margin-top: 4px;
+  }
+  .add-book-btn:hover { background: var(--yellow-dim); border-color: rgba(245,200,66,.5); }
+  .add-book-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  /* ── File Upload ── */
+  .upload-section { margin-bottom: 24px; }
+  .drop-zone {
+    border: 2px dashed rgba(139,92,246,.35); border-radius: 18px;
+    padding: 36px 20px; text-align: center; cursor: pointer;
+    transition: all .25s; background: rgba(139,92,246,.04); position: relative;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--purple); background: rgba(139,92,246,.09);
+    transform: scale(1.01);
+  }
+  .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .drop-icon { font-size: 40px; margin-bottom: 14px; display: block; }
+  .drop-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; color: var(--cream); margin-bottom: 7px; }
+  .drop-sub { font-size: 13px; color: var(--muted); }
+  .drop-sub span { color: var(--purple); font-weight: 600; }
+  .file-types { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  .file-tag { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+  .file-tag.pdf { background: rgba(255,77,141,.12); color: var(--pink); border: 1px solid rgba(255,77,141,.2); }
+  .file-tag.word { background: rgba(96,165,250,.12); color: #60a5fa; border: 1px solid rgba(96,165,250,.2); }
+  .no-limit { margin-top: 12px; font-size: 12px; color: var(--mint); font-weight: 600; }
+
+  .file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .file-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 11px 14px; animation: slideIn .3s ease both;
+    transition: border-color .2s;
+  }
+  .file-item:hover { border-color: var(--border2); }
+  .file-icon { font-size: 22px; flex-shrink: 0; }
+  .file-info { flex: 1; min-width: 0; }
+  .file-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-size { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .file-badge { font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 6px; flex-shrink: 0; text-transform: uppercase; letter-spacing: .06em; }
+  .file-badge.ready { background: rgba(45,255,160,.08); color: var(--mint); border: 1px solid rgba(45,255,160,.2); }
+  .file-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 20px; padding: 2px 4px; transition: color .2s; flex-shrink: 0; line-height: 1; }
+  .file-remove:hover { color: var(--pink); }
+
+  /* ── Notes ── */
+  .notes-field { margin-bottom: 24px; }
+  .notes-field textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+    resize: vertical; min-height: 90px;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+  }
+  .notes-field textarea::placeholder { color: var(--muted); }
+  .notes-field textarea:focus {
+    border-color: rgba(245,200,66,.5); background: var(--surface3);
+    box-shadow: 0 0 0 4px var(--yellow-dim);
+  }
+
+  /* ── Upload progress ── */
+  .upload-progress {
+    display: none; margin-bottom: 20px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px 22px;
+  }
+  .upload-progress.show { display: block; animation: fadeUp .3s ease; }
+  .upload-bar-wrap { height: 8px; background: var(--bg); border-radius: 100px; overflow: hidden; margin-bottom: 12px; }
+  .upload-bar { height: 100%; background: linear-gradient(90deg, var(--purple), var(--mint)); border-radius: 100px; transition: width .5s ease; width: 0%; }
+  .upload-status { font-size: 13px; color: var(--muted); text-align: center; font-weight: 500; }
+
+  /* ── Submit button ── */
+  .submit-btn {
+    width: 100%; padding: 19px 32px;
+    background: var(--yellow); color: var(--ink);
+    font-family: 'Syne', sans-serif; font-weight: 900; font-size: 16px;
+    letter-spacing: .05em; text-transform: uppercase;
+    border: none; border-radius: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all .25s cubic-bezier(.4,0,.2,1);
+    position: relative; overflow: hidden;
+    box-shadow: 0 8px 28px var(--yellow-glow);
+  }
+  .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(245,200,66,.35); }
+  .submit-btn:active:not(:disabled) { transform: translateY(0); }
+  .submit-btn:disabled { opacity: .55; cursor: not-allowed; transform: none !important; }
+  .submit-btn .shine {
+    position: absolute; top: 0; left: -100%; width: 55%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+    animation: shine 3.5s ease-in-out infinite;
+  }
+  @keyframes shine { 0%,100%{left:-55%} 50%{left:140%} }
+
+  /* ── Success ── */
+  .success-screen { display: none; text-align: center; padding: 70px 20px; }
+  .success-screen.show { display: block; animation: fadeUp .5s ease; }
+  .success-icon {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: var(--mint-dim); border: 2px solid rgba(45,255,160,.25);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px; font-size: 40px;
+    box-shadow: 0 0 40px rgba(45,255,160,.15);
+    animation: pop .5s cubic-bezier(.4,0,.2,1) both;
+  }
+  @keyframes pop { from{transform:scale(.7);opacity:0} to{transform:scale(1);opacity:1} }
+  .success-screen h2 { font-family: 'Syne', sans-serif; font-weight: 900; font-size: 30px; color: var(--cream); margin-bottom: 12px; }
+  .success-screen p { color: var(--muted); font-size: 16px; line-height: 1.65; margin-bottom: 8px; }
+  .submitted-summary {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 18px; padding: 22px; margin: 22px 0; text-align: left;
+  }
+  .submitted-summary h3 {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 11px;
+    color: var(--yellow); letter-spacing: .14em; text-transform: uppercase;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .submitted-summary li {
+    list-style: none; padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .submitted-summary li:last-child { border-bottom: none; }
+  .submitted-summary li::before { content: '✓'; color: var(--mint); font-weight: 700; flex-shrink: 0; font-size: 13px; }
+  .congrats-msg { color: var(--mint) !important; font-weight: 700 !important; font-size: 15px !important; }
+  .reset-btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--surface2); border: 1px solid var(--border2);
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-weight: 700; font-size: 14px; padding: 13px 28px;
+    border-radius: 14px; cursor: pointer; transition: all .2s; margin-top: 12px;
+  }
+  .reset-btn:hover { border-color: var(--yellow); color: var(--yellow); box-shadow: 0 4px 16px var(--yellow-dim); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(90px);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 13px 22px; border-radius: 14px; font-size: 14px; font-weight: 600;
+    box-shadow: 0 24px 48px rgba(0,0,0,.55);
+    transition: transform .3s cubic-bezier(.4,0,.2,1); z-index: 999;
+    white-space: nowrap; backdrop-filter: blur(12px);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { border-color: rgba(255,77,141,.4); color: var(--pink); }
+  .toast.success { border-color: rgba(45,255,160,.3); color: var(--mint); }
+</style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-pill"><span class="live-dot"></span>Daily Submission</div>
+    <h1>Submit Your<br><em>Daily eBooks</em></h1>
+    <p>Log every eBook you complete today and upload your files directly. Submit up to 10 — or however many you've done. 💪</p>
+  </div>
+
+  <!-- Form card -->
+  <div class="form-card" id="form-card">
+
+    <div class="section-label">Your Details</div>
+    <div class="identity-grid">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="writer-name" placeholder="e.g. Amara Johnson" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input type="tel" id="writer-phone" placeholder="e.g. +234 800 000 0000" autocomplete="tel">
+        <span class="hint">Include country code</span>
+      </div>
+    </div>
+
+    <div class="date-badge">📅 <span id="today-date"></span></div>
+
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Books Completed</span>
+        <span class="progress-count"><span id="filled-count">0</span> / 10</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="books-section">
+      <div class="section-label">eBooks Completed Today</div>
+      <div id="books-list"></div>
+      <button class="add-book-btn" id="add-btn" onclick="addBook()">
+        <span>＋</span> Add Another Book
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="upload-section">
+      <div class="section-label">Upload Your Files</div>
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx" onchange="handleFiles(this.files)">
+        <span class="drop-icon">📂</span>
+        <div class="drop-title">Drop files here or click to browse</div>
+        <div class="drop-sub">Upload your completed eBooks — <span>PDF or Word</span> files only</div>
+        <div class="file-types">
+          <span class="file-tag pdf">PDF</span>
+          <span class="file-tag word">.DOC</span>
+          <span class="file-tag word">.DOCX</span>
+        </div>
+        <div class="no-limit">✅ No file size limit — upload as large as needed</div>
+      </div>
+      <div class="file-list" id="file-list"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="notes-field">
+      <div class="section-label">Notes (Optional)</div>
+      <textarea id="notes" placeholder="Any challenges today? Topics you need help with? Let us know…" rows="3"></textarea>
+    </div>
+
+    <div class="upload-progress" id="upload-progress">
+      <div class="upload-bar-wrap"><div class="upload-bar" id="upload-bar"></div></div>
+      <div class="upload-status" id="upload-status">Uploading…</div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitForm()">
+      <span class="shine"></span>
+      <span>📤</span>
+      Submit Today's Work
+    </button>
+
+  </div>
+
+  <!-- Success -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">🎉</div>
+    <h2>Submission Received!</h2>
+    <p id="success-name"></p>
+    <p style="font-size:13px;margin-top:4px">Submitted on <strong id="success-date"></strong></p>
+    <div class="submitted-summary">
+      <h3>📚 Books Submitted</h3>
+      <ul id="submitted-books-list"></ul>
+    </div>
+    <div class="submitted-summary" id="files-summary" style="display:none">
+      <h3>📁 Files Uploaded</h3>
+      <ul id="submitted-files-list"></ul>
+    </div>
+    <p class="congrats-msg">Keep going — you're doing amazing! 🚀</p>
+    <button class="reset-btn" onclick="resetForm()">↩ Submit More</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Points to the live server (always ON, even when laptop is off) ──
+  const UPLOAD_URL = 'https://globalmedia.alwaysdata.net/ebooks/upload.php';
+
+  let bookCount = 0;
+  let selectedFiles = [];
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  document.getElementById('today-date').textContent = dateStr;
+
+  // ── Book rows ──
+  function init() { for (let i = 0; i < 3; i++) addBook(); }
+
+  function addBook() {
+    if (bookCount >= 10) return;
+    bookCount++;
+    const num = bookCount;
+    const div = document.createElement('div');
+    div.className = 'book-row'; div.id = `book-row-${num}`;
+    div.innerHTML = `
+      <div class="book-num">${num}</div>
+      <div class="book-input-wrap">
+        <input type="text" id="book-${num}" placeholder="eBook title #${num}">
+        <svg class="book-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      ${num > 1 ? `<button class="remove-btn" onclick="removeBook(${num})">×</button>` : '<div style="width:34px"></div>'}
+    `;
+    document.getElementById('books-list').appendChild(div);
+    document.getElementById(`book-${num}`).addEventListener('input', function() {
+      this.classList.toggle('filled', this.value.trim().length > 0);
+      updateProgress();
+    });
+    document.getElementById('add-btn').disabled = bookCount >= 10;
+    updateProgress();
+  }
+
+  function removeBook(num) {
+    const row = document.getElementById(`book-row-${num}`);
+    if (row) { row.style.opacity = '0'; row.style.transform = 'translateX(-8px)'; setTimeout(() => row.remove(), 200); }
+    bookCount--;
+    document.getElementById('add-btn').disabled = false;
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const inputs = document.querySelectorAll('#books-list input[type="text"]');
+    const filled = [...inputs].filter(i => i.value.trim().length > 0).length;
+    document.getElementById('filled-count').textContent = filled;
+    document.getElementById('progress-fill').style.width = `${(filled / 10) * 100}%`;
+  }
+
+  // ── File handling ──
+  const dropZone = document.getElementById('drop-zone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+
+  function handleFiles(fileList) {
+    const allowed = ['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    for (const file of fileList) {
+      if (!allowed.includes(file.type) && !file.name.match(/\.(pdf|doc|docx)$/i)) {
+        showToast(`${file.name} — PDF or Word only`, 'error'); continue;
+      }
+      if (selectedFiles.find(f => f.name === file.name)) continue;
+      if (selectedFiles.length >= 10) { showToast('Max 10 files per submission', 'error'); break; }
+      selectedFiles.push(file);
+      renderFile(file);
+    }
+  }
+
+  function renderFile(file) {
+    const isPdf = file.name.match(/\.pdf$/i);
+    const size  = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1)+' MB' : (file.size/1024).toFixed(0)+' KB';
+    const id    = 'fi_' + file.name.replace(/[^a-z0-9]/gi,'_');
+    const div   = document.createElement('div');
+    div.className = 'file-item'; div.id = id;
+    div.innerHTML = `
+      <span class="file-icon">${isPdf ? '📄' : '📝'}</span>
+      <div class="file-info">
+        <div class="file-name">${file.name}</div>
+        <div class="file-size">${size}</div>
+      </div>
+      <span class="file-badge ready">Ready</span>
+      <button class="file-remove" onclick="removeFile('${file.name}','${id}')">×</button>
+    `;
+    document.getElementById('file-list').appendChild(div);
+  }
+
+  function removeFile(name, id) {
+    selectedFiles = selectedFiles.filter(f => f.name !== name);
+    const el = document.getElementById(id);
+    if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 200); }
+  }
+
+  // ── Submit ──
+  async function submitForm() {
+    const name  = document.getElementById('writer-name').value.trim();
+    const phone = document.getElementById('writer-phone').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+
+    let valid = true;
+    if (!name)  { document.getElementById('writer-name').classList.add('error');  showToast('Please enter your full name', 'error'); valid = false; }
+    else          document.getElementById('writer-name').classList.remove('error');
+    if (!phone) { document.getElementById('writer-phone').classList.add('error'); if (valid) showToast('Please enter your phone number','error'); valid = false; }
+    else          document.getElementById('writer-phone').classList.remove('error');
+    if (!valid) return;
+
+    const inputs = document.querySelectorAll('#books-list input[type="text"]');
+    const books  = [...inputs].map(i => i.value.trim()).filter(Boolean);
+    if (!books.length) { showToast('Please enter at least one eBook title', 'error'); return; }
+
+    // ── Duplicate book title check ──
+    const lower = books.map(b => b.toLowerCase());
+    const seen = new Set();
+    for (const title of lower) {
+      if (seen.has(title)) {
+        showToast(`"${books[lower.indexOf(title)]}" was entered more than once`, 'error');
+        return;
+      }
+      seen.add(title);
+    }
+
+    // ── Prevent double submission ──
+    const btn = document.getElementById('submit-btn');
+    if (btn.dataset.submitting === 'true') return;
+    btn.dataset.submitting = 'true';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="shine"></span><span>⏳</span> Uploading…';
+
+    const prog   = document.getElementById('upload-progress');
+    const bar    = document.getElementById('upload-bar');
+    const status = document.getElementById('upload-status');
+    prog.classList.add('show');
+    bar.style.width = '10%';
+    status.textContent = 'Preparing your submission…';
+
+    try {
+      const formData = new FormData();
+      formData.append('name',  name);
+      formData.append('phone', phone);
+      formData.append('date',  today.toISOString().split('T')[0]);
+      formData.append('notes', notes);
+      formData.append('books', JSON.stringify(books));
+      for (const file of selectedFiles) {
+        formData.append('files[]', file, file.name);
+      }
+
+      status.textContent = selectedFiles.length > 0
+        ? `Uploading ${selectedFiles.length} file(s) to server…`
+        : 'Saving your submission…';
+      bar.style.width = '40%';
+
+      const res    = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+      bar.style.width = '85%';
+      status.textContent = 'Finalising…';
+
+      const result = await res.json();
+      bar.style.width = '100%';
+
+      if (!result.success) throw new Error(result.message || 'Server error');
+      status.textContent = '✅ Done!';
+
+      setTimeout(() => {
+        document.getElementById('form-card').style.display = 'none';
+        document.getElementById('success-screen').classList.add('show');
+        document.getElementById('success-name').textContent  = `Great work, ${name}! 🙌`;
+        document.getElementById('success-date').textContent  = dateStr;
+        document.getElementById('submitted-books-list').innerHTML = books.map(b => `<li>${b}</li>`).join('');
+        if (result.files && result.files.length > 0) {
+          document.getElementById('files-summary').style.display = 'block';
+          document.getElementById('submitted-files-list').innerHTML =
+            result.files.map(f => `<li>${f.original} <span style="opacity:.45;font-size:11px">(${f.size_mb} MB)</span></li>`).join('');
+        }
+      }, 700);
+
+    } catch (err) {
+      showToast('Something went wrong: ' + err.message, 'error');
+      btn.disabled = false;
+      btn.dataset.submitting = '';
+      btn.innerHTML = '<span class="shine"></span><span>📤</span> Submit Today\'s Work';
+      prog.classList.remove('show');
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('form-card').style.display = 'block';
+    document.getElementById('success-screen').classList.remove('show');
+    document.getElementById('writer-name').value = '';
+    document.getElementById('writer-phone').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('books-list').innerHTML = '';
+    document.getElementById('file-list').innerHTML = '';
+    document.getElementById('upload-progress').classList.remove('show');
+    document.getElementById('files-summary').style.display = 'none';
+    selectedFiles = []; bookCount = 0;
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = false;
+    btn.dataset.submitting = '';
+    btn.innerHTML = '<span class="shine"></span><span>📤</span> Submit Today\'s Work';
+    init();
+  }
+
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  init();
+</script>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOD Project Update Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Outfit', sans-serif;
+      --color-bg-base: #f9fafb;
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f3f4f6;
+      --color-text-primary: #111827;
+      --color-text-secondary: #4b5563;
+      --color-text-tertiary: #6b7280;
+      --color-border-tertiary: #e5e7eb;
+      --color-border-secondary: #d1d5db;
+      --border-radius-md: 12px;
+      --border-radius-lg: 20px;
+
+      --color-info: #3b82f6;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+
+      --color-background-info: rgba(59, 130, 246, 0.1);
+      --color-text-info: #2563eb;
+
+      --color-background-success: rgba(16, 185, 129, 0.1);
+      --color-text-success: #059669;
+
+      --color-background-warning: rgba(245, 158, 11, 0.1);
+      --color-text-warning: #d97706;
+
+      --color-background-danger: rgba(239, 68, 68, 0.1);
+      --color-text-danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg-base);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    /* Typography */
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 32px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Metrics Grid */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .metric {
+      background: var(--color-background-primary);
+      border-radius: var(--border-radius-lg);
+      padding: 24px;
+      border: 1px solid var(--color-border-tertiary);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .metric:hover {
+      border-color: var(--color-border-secondary);
+      background: var(--color-background-primary);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .metric::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-color, var(--color-info));
+      border-radius: 4px 0 0 4px;
+    }
+
+    .metric:nth-child(1) {
+      --accent-color: var(--color-info);
+    }
+
+    .metric:nth-child(2) {
+      --accent-color: var(--color-success);
+    }
+
+    .metric:nth-child(3) {
+      --accent-color: var(--color-warning);
+    }
+
+    .metric:nth-child(4) {
+      --accent-color: var(--color-danger);
+    }
+
+    .metric-val {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .metric:nth-child(1) .metric-val {
+      color: var(--color-text-info);
+    }
+
+    .metric:nth-child(2) .metric-val {
+      color: var(--color-text-success);
+    }
+
+    .metric:nth-child(3) .metric-val {
+      color: var(--color-text-warning);
+    }
+
+    .metric:nth-child(4) .metric-val {
+      color: var(--color-text-danger);
+    }
+
+    .metric-label {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .metric-sub {
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      margin-top: 4px;
+    }
+
+    /* Pipeline */
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .pipe-stage {
+      text-align: center;
+      padding: 16px 8px;
+      position: relative;
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      transition: all 0.3s ease;
+      cursor: default;
+    }
+
+    .pipe-stage:hover {
+      transform: scale(1.05);
+      border-color: var(--color-border-secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .pipe-stage:not(:last-child)::after {
+      content: '›';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-tertiary);
+      font-size: 24px;
+      z-index: 10;
+    }
+
+    .pipe-bubble {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 auto 12px;
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .pipe-name {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .pipe-count {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    /* Layout Grids */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    /* Geo bars */
+    .geo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .geo-bar-wrap {
+      flex: 1;
+      height: 8px;
+      background: var(--color-background-secondary);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .geo-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .geo-label {
+      min-width: 80px;
+      color: var(--color-text-secondary);
+    }
+
+    .geo-pct {
+      min-width: 40px;
+      text-align: right;
+      color: var(--color-text-tertiary);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* Timeline */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .week-card {
+      border: 1px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      padding: 16px;
+      background: var(--color-background-primary);
+      transition: all 0.3s ease;
+    }
+
+    .week-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+      border-color: var(--color-border-secondary);
+    }
+
+    .week-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .week-item {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      margin-bottom: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .week-item .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    /* Pay Rows */
+    .pay-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-border-tertiary);
+      font-size: 14px;
+    }
+
+    .pay-row:last-child {
+      border-bottom: none;
+    }
+
+    .pay-label {
+      color: var(--color-text-secondary);
+    }
+
+    .pay-val {
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    /* Recommendations */
+    .rec-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border-tertiary);
+      padding: 16px;
+      border-radius: var(--border-radius-md);
+      transition: all 0.2s ease;
+    }
+
+    .rec-row:hover {
+      transform: translateX(4px);
+      border-color: var(--color-border-secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .rec-icon {
+      font-size: 20px;
+      margin-top: 2px;
+      background: var(--color-background-secondary);
+      padding: 8px;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    /* Badges & Chips */
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .badge-info {
+      background: var(--color-background-info);
+      color: var(--color-text-info);
+    }
+
+    .status-chip {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--color-background-warning);
+      color: var(--color-text-warning);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      font-weight: 500;
+    }
+
+    .alert-box {
+      font-size: 13px;
+      color: var(--color-text-warning);
+      background: var(--color-background-warning);
+      border-radius: var(--border-radius-md);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--color-border-tertiary);
+    }
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .header-subtitle span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+
+      .metric-grid,
+      .two-col,
+      .pipeline,
+      .timeline {
+        grid-template-columns: 1fr;
+      }
+
+      .pipe-stage:not(:last-child)::after {
+        content: '↓';
+        right: 50%;
+        top: auto;
+        bottom: -20px;
+        transform: translateX(50%);
+      }
+
+      .pipeline {
+        gap: 24px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1 class="header-title">Ebook Writers Project</h1>
+        <div class="header-subtitle">
+          <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+              </path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg> HOD Update</span>
+          <span>•</span>
+          <span>Global Media</span>
+          <span>•</span>
+          <span>April 2026, Week 1</span>
+        </div>
+      </div>
+      <span class="badge badge-info">Status: Active</span>
+    </div>
+
+    <!-- Hiring pipeline -->
+    <div class="card">
+      <div class="card-title">Hiring Pipeline Flow</div>
+      <div class="pipeline">
+        <div class="pipe-stage">
+          <div class="pipe-bubble" style="background:var(--color-background-info); color:var(--color-text-info);">69
+          </div>
+          <div class="pipe-count">69 Applied</div>
+          <div class="pipe-name">Initial Applications</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-bubble" style="background:var(--color-background-warning); color:var(--color-text-warning);">
+            16</div>
+          <div class="pipe-count">16 Writing</div>
+          <div class="pipe-name">Active Assessment</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-bubble" style="background:var(--color-background-danger); color:var(--color-text-danger);">?
+          </div>
+          <div class="pipe-count">Pending Review</div>
+          <div class="pipe-name">Shortlisted</div>
+        </div>
+        <div class="pipe-stage">
+          <div class="pipe-bubble" style="background:var(--color-background-success); color:var(--color-text-success);">
+            4</div>
+          <div class="pipe-count">Target Goal: 4</div>
+          <div class="pipe-name">Hired</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Geo coverage -->
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title">
+          Applicant Geography
+          <span class="status-chip">Needs Attention</span>
+        </div>
+        <div style="margin-bottom:16px; margin-top:24px;">
+          <div class="geo-row">
+            <div class="geo-label">Uganda 🇺🇬</div>
+            <div class="geo-bar-wrap">
+              <div class="geo-bar" style="width:0%; background:var(--color-info);" data-width="100"></div>
+            </div>
+            <div class="geo-pct">100%</div>
+          </div>
+          <div class="geo-row">
+            <div class="geo-label">International</div>
+            <div class="geo-bar-wrap">
+              <div class="geo-bar" style="width:0%; background:var(--color-success);" data-width="0"></div>
+            </div>
+            <div class="geo-pct">0%</div>
+          </div>
+        </div>
+        <div class="alert-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          Link only reached local contacts so far. International outreach urgently needed.
+        </div>
+      </div>
+
+      <!-- Pay recommendation -->
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title">Compensation Strategy</div>
+        <div class="pay-row">
+          <div class="pay-label">Market Range (Research)</div>
+          <div class="pay-val">500k – 800k UGX</div>
+        </div>
+        <div class="pay-row">
+          <div class="pay-label">Recommended Offer</div>
+          <div class="pay-val" style="color:var(--color-text-success);">600k – 650k UGX</div>
+        </div>
+        <div class="pay-row">
+          <div class="pay-label">Role Scope</div>
+          <div class="pay-val">Research + Writing</div>
+        </div>
+        <div class="pay-row">
+          <div class="pay-label">Writers Needed</div>
+          <div class="pay-val">4 positions</div>
+        </div>
+        <div
+          style="font-size:13px; color:var(--color-text-tertiary); margin-top:16px; background:var(--color-background-secondary); padding: 12px; border-radius: 8px;">
+          Mid-range ensures quality hires without exceeding budget constraints.
+        </div>
+      </div>
+    </div>
+
+    <!-- 4-week timeline -->
+    <div class="card" style="margin-top:24px;">
+      <div class="card-title">Project Timeline <span
+          style="font-size: 13px; font-weight:normal; color:var(--color-text-tertiary);">4-Week Scope</span></div>
+      <div class="timeline">
+        <div class="week-card" style="border-top: 3px solid var(--color-info);">
+          <div class="week-title" style="color:var(--color-text-info);">Week 1 — Setup ✓</div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-info);"></div>Platforms created
+          </div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-info);"></div>Recruitment link live
+          </div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-info);"></div>16 writers onboarded
+          </div>
+        </div>
+        <div class="week-card" style="border-top: 3px solid var(--color-warning);">
+          <div class="week-title" style="color:var(--color-text-warning);">Week 2 — Assessment</div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-warning);"></div>2-day writing test
+          </div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-warning);"></div>Research-based task
+          </div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-warning);"></div>Quality evaluation
+          </div>
+        </div>
+        <div class="week-card" style="border-top: 3px solid var(--color-border-tertiary);">
+          <div class="week-title">Week 3 — Hiring</div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-border-secondary);"></div>Select top 4 writers
+          </div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-border-secondary);"></div>Contracts & pay set
+          </div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-border-secondary);"></div>Broaden geo outreach
+          </div>
+        </div>
+        <div class="week-card" style="border-top: 3px solid var(--color-border-tertiary);">
+          <div class="week-title">Week 4 — Production</div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-border-secondary);"></div>Full ebook writing
+          </div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-border-secondary);"></div>Research integration
+          </div>
+          <div class="week-item">
+            <div class="dot" style="background:var(--color-border-secondary);"></div>First draft delivery
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="card">
+      <div class="card-title">Strategic Guidance & Next Steps</div>
+      <div style="margin-top:20px;">
+        <div class="rec-row">
+          <div class="rec-icon">💰</div>
+          <div><strong style="color:var(--color-text-primary);">kindly Ma it can be typed here.</div>
+        </div>
+        <div class="rec-row">
+          <div class="rec-icon">📝</div>
+          <div><strong style="color:var(--color-text-primary);">Initiate the 2-day assessment(Interviews to lock in the
+              final 4)<br>
+            </strong><br>Issue the 16
+            Kindly requesting for bro Wilbroad to do the finale interview because is very good at making these
+            communications Ma(I will draft the key talking points)/div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Animate numbers counting up
+        const counters = document.querySelectorAll('.count-up');
+        const speed = 200; // The lower the slower
+
+        counters.forEach(counter => {
+          const updateCount = () => {
+            const target = +counter.getAttribute('data-target');
+            const count = +counter.innerText;
+
+            const inc = target / speed;
+
+            if (count < target) {
+              counter.innerText = Math.ceil(count + inc);
+              setTimeout(updateCount, 15);
+            } else {
+              counter.innerText = target;
+            }
+          });
+
+        updateCount();
+      });
+
+      // Animate progress bars after a slight delay
+      setTimeout(() => {
+        const bars = document.querySelectorAll('.geo-bar');
+        bars.forEach(bar => {
+          const targetWidth = bar.getAttribute('data-width');
+          bar.style.width = targetWidth + '%';
+        });
+      }, 500);
+  });
+    </script>
+</body>
+
+</html>
