@@ -1,4 +1,0 @@
-# Block ALL direct browser access to this folder and its files
-Options -Indexes
-Order deny,allow
-Deny from all

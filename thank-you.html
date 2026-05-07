@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thank You — Not Nothing</title>
+  <meta name="robots" content="noindex" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <style>
+    .ty-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 40px 5%;
+      background: radial-gradient(ellipse at 50% 30%, rgba(201,168,76,.1), transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(124,92,191,.1), transparent 50%),
+                  var(--dark);
+    }
+    .ty-card {
+      max-width: 560px; width: 100%;
+      background: var(--surface); border: 1px solid rgba(201,168,76,.25);
+      border-radius: 24px; padding: 52px 44px; text-align: center;
+      box-shadow: 0 0 80px rgba(201,168,76,.07);
+      animation: slideUp .6s ease both;
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+    .ty-icon {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(201,168,76,.2), rgba(124,92,191,.2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem; margin: 0 auto 24px;
+      border: 2px solid rgba(201,168,76,.3);
+    }
+    .ty-card h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      color: var(--text); margin-bottom: 12px;
+    }
+    .ty-card h1 span {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .ty-subtitle { color: var(--text-muted); font-size: .97rem; margin-bottom: 28px; line-height: 1.6; }
+    .ty-details {
+      background: var(--surface2); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px; padding: 20px 24px; margin-bottom: 28px; text-align: left;
+    }
+    .ty-details h4 { color: var(--text); font-size: .85rem; font-weight: 600; margin-bottom: 12px; letter-spacing: .5px; text-transform: uppercase; }
+    .ty-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+    .ty-row:last-child { border-bottom: none; }
+    .ty-row span:first-child { color: var(--text-muted); font-size: .85rem; }
+    .ty-row span:last-child { color: var(--text); font-size: .85rem; font-weight: 500; }
+    .ty-next { margin-bottom: 28px; }
+    .ty-next h4 { color: var(--text); font-size: .85rem; font-weight: 600; margin-bottom: 12px; letter-spacing: .5px; text-transform: uppercase; }
+    .ty-next-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .ty-next-icon { font-size: 1.1rem; margin-top: 1px; flex-shrink: 0; }
+    .ty-next-text { font-size: .88rem; color: var(--text-muted); line-height: 1.5; }
+    .ty-next-text strong { color: var(--text); }
+    .ty-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .ty-order-id { margin-top: 20px; font-size: .75rem; color: var(--text-muted); }
+    .ty-order-id code { color: var(--gold); font-family: monospace; }
+  </style>
+</head>
+<body>
+<nav id="main-nav" aria-label="Main navigation">
+  <a href="index.html" class="nav-logo">📖 Not Nothing</a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html#book">The Book</a></li>
+    <li><a href="index.html#features">Why Read It</a></li>
+    <li><a href="index.html#author">Author</a></li>
+  </ul>
+  <a href="index.html" class="btn-nav">← Home</a>
+  <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="ty-page">
+  <div class="ty-card">
+    <div class="ty-icon">✅</div>
+    <h1>Thank You — <span>You're In!</span></h1>
+    <p class="ty-subtitle">
+      Your payment was successful. You're now the owner of <em>Not Nothing: Small Designs That Save Lives</em>.
+    </p>
+
+    <!-- Order summary filled by JS -->
+    <div class="ty-details">
+      <h4>Order Summary</h4>
+      <div class="ty-row"><span>Book</span><span>Not Nothing</span></div>
+      <div class="ty-row"><span>Format</span><span id="ty-format">—</span></div>
+      <div class="ty-row"><span>Amount Paid</span><span id="ty-amount">—</span></div>
+      <div class="ty-row"><span>Payment</span><span style="color:#4ade80">✓ Confirmed</span></div>
+    </div>
+
+    <!-- What happens next -->
+    <div class="ty-next">
+      <h4>What Happens Next</h4>
+      <div id="ty-next-content">
+        <!-- Populated by JS based on format -->
+      </div>
+    </div>
+
+    <div class="ty-actions">
+      <a href="index.html" class="btn-secondary">← Back to Site</a>
+    </div>
+
+    <p class="ty-order-id">Order ID: <code id="ty-order-id">—</code></p>
+  </div>
+</div>
+
+<script>
+  // Read URL params
+  const params   = new URLSearchParams(window.location.search);
+  const orderId  = params.get('order')  || 'N/A';
+  const format   = params.get('format') || 'ebook';
+  const amount   = params.get('amount') || '9.99';
+
+  const labels = { ebook: '📱 eBook', paperback: '📗 Paperback', hardcover: '📕 Hardcover' };
+
+  document.getElementById('ty-order-id').textContent = orderId;
+  document.getElementById('ty-format').textContent   = labels[format] || format;
+  document.getElementById('ty-amount').textContent   = '$' + amount + ' USD';
+
+  // Dynamic "What Happens Next" based on format
+  const nextEl = document.getElementById('ty-next-content');
+  if (format === 'ebook') {
+    nextEl.innerHTML = `
+      <div class="ty-next-item"><div class="ty-next-icon">📧</div><div class="ty-next-text"><strong>Check your email.</strong> Your eBook download link will arrive within 24 hours.</div></div>
+      <div class="ty-next-item"><div class="ty-next-icon">📂</div><div class="ty-next-text"><strong>Check your spam folder</strong> if you don't see it in your inbox.</div></div>
+      <div class="ty-next-item"><div class="ty-next-icon">💬</div><div class="ty-next-text"><strong>Questions?</strong> Reply to the confirmation email and we'll get back to you quickly.</div></div>
+    `;
+  } else {
+    nextEl.innerHTML = `
+      <div class="ty-next-item"><div class="ty-next-icon">📦</div><div class="ty-next-text"><strong>Your order is being prepared.</strong> Physical books are shipped to the address on your PayPal account.</div></div>
+      <div class="ty-next-item"><div class="ty-next-icon">🚚</div><div class="ty-next-text"><strong>Estimated delivery: 5–10 business days</strong> depending on your location.</div></div>
+      <div class="ty-next-item"><div class="ty-next-icon">📧</div><div class="ty-next-text"><strong>A confirmation email</strong> with your order details has been sent to you.</div></div>
+      <div class="ty-next-item"><div class="ty-next-icon">💬</div><div class="ty-next-text"><strong>Questions?</strong> Reply to the confirmation email and we'll sort it out.</div></div>
+    `;
+  }
+
+  // Nav hamburger
+  document.getElementById('hamburger')?.addEventListener('click', () => {
+    document.getElementById('nav-links').classList.toggle('open');
+  });
+</script>
+</body>
+</html>
